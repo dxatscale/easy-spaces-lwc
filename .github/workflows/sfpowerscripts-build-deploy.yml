@@ -33,8 +33,8 @@ jobs:
             - name: 'Authenticate to DevHub'
               shell: bash
               run: |
-                     echo ${{ secrets.MA_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.MA_USERNAME }} -i ${{ secrets.MA_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
+                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
                      rm -f ./JWT_KEYFILE
 
             # Create all packages
@@ -80,8 +80,8 @@ jobs:
             - name: 'Authenticate to DevHub'
               shell: bash
               run: |
-                     echo ${{ secrets.MA_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.MA_USERNAME }} -i ${{ secrets.MA_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
+                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
                      rm -f ./JWT_KEYFILE
 
             # Create scratch org
@@ -121,8 +121,8 @@ jobs:
            - name: 'Authenticate to DevHub'
              shell: bash
              run: |
-                     echo ${{ secrets.MA_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.MA_USERNAME }} -i ${{ secrets.MA_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
+                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
                      rm -f ./JWT_KEYFILE
 
              # Create all packages
@@ -172,8 +172,8 @@ jobs:
              - name: 'Authenticate to DevHub'
                shell: bash
                run: |
-                     echo ${{ secrets.MA_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.MA_USERNAME }} -i ${{ secrets.MA_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
+                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
                      rm -f ./JWT_KEYFILE
 
 

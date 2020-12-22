@@ -11,82 +11,33 @@ on:
 
 # Jobs to be executed
 jobs:
-    formatting-and-linting:
-        runs-on: ubuntu-latest
-        steps:
-            # Checkout the code in the pull request
-            - name: 'Checkout source code'
-              uses: actions/checkout@v2
-
-            # Cache node_modules to speed up the process
-            - name: Restore node_modules cache
-              id: cache-npm
-              uses: actions/cache@v1
-              with:
-                  path: node_modules
-                  key: npm-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                      npm-${{ env.cache-name }}-
-                      npm-
-
-            # Install npm dependencies for Prettier and Jest
-            - name: 'Install npm dependencies'
-              if: steps.cache-npm.outputs.cache-hit != 'true'
-              run: npm ci
-
-            # Prettier formatting
-            - name: 'Code formatting verification with Prettier'
-              run: npm run prettier:verify
-
-            # Lint LWC
-            - name: 'Lint Lightning Web Components'
-              run: npm run lint:lwc
-
-            # Unit tests
-            - name: 'Unit test Lightning Web Components'
-              run: npm run test:unit:coverage
-
-            # Upload code coverage data
-            - name: 'Upload code coverage for LWC to Codecov.io'
-              uses: codecov/codecov-action@v1
-              with:
-                  flags: LWC
-
     validate:
         runs-on: ubuntu-latest
         needs: formatting-and-linting
         steps:
-            # Install Salesforce CLI
-            - name: Install Salesforce CLI
+           # Install sfdx and plugins
+            - name: Install SFDX and Plugins
               run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                  mkdir sfdx-cli
-                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                  ./sfdx-cli/install
-
-             # Install sfpowerkit
-            - name: Install sfpowerkit
-              run: |
-                  echo 'y' | sfdx plugins:install sfpowerkit
-
-             # Install sfpowerscripts
-            - name: Install sfpowerscripts
-              run: |
-                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
+                     wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                     mkdir sfdx-cli
+                     tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                     ./sfdx-cli/install
+                     echo 'y' | sfdx plugins:install sfpowerkit
+                     echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
 
 
             # Checkout the code in the pull request
             - name: 'Checkout source code'
               uses: actions/checkout@v2
 
-            # Store secret for dev hub
-            - name: 'Populate auth file with MA_SERVER_KEY secret'
+            # Copy Dev Hub server key to file
+            - name: 'Copy Dev Hub server key to file'
               shell: bash
-              run: 'echo ${{ secrets.MA_SERVER_KEY }} > ./JWT_KEYFILE'
+              run: 'echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE'
 
             # Validate source and trigger test
             - name: 'Push source to scratch org'
-              run: 'sfdx sfpowerscipts:orchestrate:validate -f ./JWT_KEYFILE -i ${{ secrets.MA_CLIENT_ID }} -p CI1 -u  ${{ secrets.MA_USERNAME }}'
+              run: 'sfdx sfpowerscipts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
 
             # Upload code coverage data
             - name: 'Upload code coverage for Apex to Codecov.io'
