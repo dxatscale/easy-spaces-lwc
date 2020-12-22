@@ -63,7 +63,7 @@ jobs:
                   mkdir sfdx-cli
                   tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
                   ./sfdx-cli/install
-            
+
              # Install sfpowerkit
             - name: Install sfpowerkit
               run: |
@@ -80,17 +80,16 @@ jobs:
               uses: actions/checkout@v2
 
             # Store secret for dev hub
-            - name: 'Populate auth file with DEVHUB_SFDX_URL secret'
+            - name: 'Populate auth file with MA_SERVER_KEY secret'
               shell: bash
-              run: 'echo ${{ secrets.DEVHUB_JWTKEY_FILE }} > ./DEVHUB_JWTKEY_FILE'
+              run: 'echo ${{ secrets.MA_SERVER_KEY }} > ./JWT_KEYFILE'
 
             # Validate source and trigger test
             - name: 'Push source to scratch org'
-              run: 'sfdx sfpowerscipts:orchestrate:validate -f ./DEVHUB_JWTKEY_FILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }}'
+              run: 'sfdx sfpowerscipts:orchestrate:validate -f ./JWT_KEYFILE -i ${{ secrets.MA_CLIENT_ID }} -p CI1 -u  ${{ secrets.MA_USERNAME }}'
 
             # Upload code coverage data
             - name: 'Upload code coverage for Apex to Codecov.io'
               uses: codecov/codecov-action@v1
               with:
                   flags: Apex
-

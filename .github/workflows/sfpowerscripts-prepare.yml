@@ -26,7 +26,7 @@ jobs:
                   mkdir sfdx-cli
                   tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
                   ./sfdx-cli/install
-            
+
              # Install sfpowerkit
             - name: Install sfpowerkit
               run: |
@@ -37,18 +37,15 @@ jobs:
               run: |
                   echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
 
-            # Store secret for dev hub
-            - name: 'Populate auth file with DEVHUB_SFDX_URL secret'
-              shell: bash
-              run: 'echo ${{ secrets.DEVHUB_SFDX_URL}} > ./DEVHUB_SFDX_URL.txt'
-
 
             # Authenticate dev hub
             - name: 'Authenticate Dev Hub'
-              run: 'sfdx force:auth:sfdxurl:store -f ./DEVHUB_SFDX_URL.txt -a devhub -d'
+              run: |
+                     echo ${{ secrets.MA_SERVER_KEY }} > ./JWT_KEYFILE
+                     sfdx force:auth:jwt:grant -u ${{ secrets.MA_USERNAME }} -i ${{ secrets.MA_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                     rm -f ./JWT_KEYFILE
 
 
             # Prepare a pool of scratch orgs
             - name: 'Prepare a pool of scratch orgs'
               run: 'sfdx sfpowerscripts:orchestrator:prepare -t CI1 -v devhub --installall --installassourcepackages -m 2'
-
