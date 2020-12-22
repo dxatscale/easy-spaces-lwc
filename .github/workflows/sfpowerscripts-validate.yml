@@ -39,7 +39,7 @@ jobs:
 
             # Validate source and trigger test
             - name: 'Push source to scratch org'
-              run: 'sfdx sfpowerscipts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
+              run: 'sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
 
             # Upload code coverage data
             - name: 'Upload code coverage for Apex to Codecov.io'
