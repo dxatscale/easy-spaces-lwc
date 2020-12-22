@@ -14,28 +14,28 @@ jobs:
         name: QuickBuild the packages
         runs-on: ubuntu-latest
         steps:
-
             # Install CLI and PLugins
             - name: Install SFDX and Plugins
               run: |
-                     wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                     mkdir sfdx-cli
-                     tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                     ./sfdx-cli/install
-                     echo 'y' | sfdx plugins:install sfpowerkit
-                     echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
+                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                  mkdir sfdx-cli
+                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                  ./sfdx-cli/install
+                  echo 'y' | sfdx plugins:install sfpowerkit
+                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
 
             # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
 
-             # Authenticate to DevHub
-            - name: 'Authenticate to DevHub'
-              shell: bash
+            # Authenticate dev hub
+            - name: 'Authenticate Dev Hub'
               run: |
-                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
-                     rm -f ./JWT_KEYFILE
+                  echo "${SALESFORCE_JWT_SECRET_KEY}" > ./JWT_KEYFILE
+                  sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                  rm -f ./JWT_KEYFILE
+              env:
+                  SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }}
 
             # Create all packages
             - name: 'Create packages'
@@ -45,8 +45,8 @@ jobs:
             # Publish artifacts
             - uses: actions/upload-artifact@v2
               with:
-                 name: quickbuild-artifacts
-                 path: artifacts
+                  name: quickbuild-artifacts
+                  path: artifacts
 
     # Simulating a deploy to System Test Environment using a scratch org
     deploy:
@@ -54,7 +54,7 @@ jobs:
         runs-on: ubuntu-latest
         needs: quickbuild
         steps:
-             # Checkout the code
+            # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
 
@@ -65,24 +65,24 @@ jobs:
                   name: quickbuild-artifacts
                   path: artifacts
 
-
               # Install sfdx and plugins
             - name: Install SFDX and Plugins
               run: |
-                     wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                     mkdir sfdx-cli
-                     tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                     ./sfdx-cli/install
-                     echo 'y' | sfdx plugins:install sfpowerkit
-                     echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
+                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                  mkdir sfdx-cli
+                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                  ./sfdx-cli/install
+                  echo 'y' | sfdx plugins:install sfpowerkit
+                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
 
-             # Authenticate to DevHub
-            - name: 'Authenticate to DevHub'
-              shell: bash
+            # Authenticate dev hub
+            - name: 'Authenticate Dev Hub'
               run: |
-                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
-                     rm -f ./JWT_KEYFILE
+                  echo "${SALESFORCE_JWT_SECRET_KEY}" > ./JWT_KEYFILE
+                  sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                  rm -f ./JWT_KEYFILE
+              env:
+                  SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }}
 
             # Create scratch org
             - name: Create scratch org
@@ -98,86 +98,82 @@ jobs:
               run: sfdx force:org:delete -p -u scratch-org
 
     build:
-         name: Build Production Ready packages
-         runs-on: ubuntu-latest
-         needs: deploy
-         steps:
+        name: Build Production Ready packages
+        runs-on: ubuntu-latest
+        needs: deploy
+        steps:
             # Install sfdx and plugins
-           - name: Install SFDX and Plugins
-             run: |
-                   wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                   mkdir sfdx-cli
-                   tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                   ./sfdx-cli/install
-                   echo 'y' | sfdx plugins:install sfpowerkit
-                   echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
+            - name: Install SFDX and Plugins
+              run: |
+                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                  mkdir sfdx-cli
+                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                  ./sfdx-cli/install
+                  echo 'y' | sfdx plugins:install sfpowerkit
+                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
 
-             # Checkout the code
-           - name: 'Checkout source code'
-             uses: actions/checkout@v2
+              # Checkout the code
+            - name: 'Checkout source code'
+              uses: actions/checkout@v2
 
+              # Authenticate dev hub
+            - name: 'Authenticate Dev Hub'
+              run: |
+                  echo "${SALESFORCE_JWT_SECRET_KEY}" > ./JWT_KEYFILE
+                  sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                  rm -f ./JWT_KEYFILE
+              env:
+                  SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }}
 
-            # Authenticate to DevHub
-           - name: 'Authenticate to DevHub'
-             shell: bash
-             run: |
-                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
-                     rm -f ./JWT_KEYFILE
+              # Create all packages
+            - name: 'Create packages'
+              id: sfpowerscripts-build
+              run: 'sfdx sfpowerscripts:orchestrator:build -v devhub'
 
-             # Create all packages
-           - name: 'Create packages'
-             id: sfpowerscripts-build
-             run: 'sfdx sfpowerscripts:orchestrator:build -v devhub'
-
-             # Publish artifacts
-           - uses: actions/upload-artifact@v2
-             with:
-                 name: validated-artifacts
-                 path: artifacts
+              # Publish artifacts
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: validated-artifacts
+                  path: artifacts
 
     promote:
-         runs-on: ubuntu-latest
-         if: always()
-         needs: build
-         name: Promote the packages
-         steps:
+        runs-on: ubuntu-latest
+        if: always()
+        needs: build
+        name: Promote the packages
+        steps:
+            # Install sfdx and plugins
+            - name: Install SFDX and Plugins
+              run: |
+                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                  mkdir sfdx-cli
+                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                  ./sfdx-cli/install
+                  echo 'y' | sfdx plugins:install sfpowerkit
+                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
 
-           # Install sfdx and plugins
-             - name: Install SFDX and Plugins
-               run: |
-                   wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                   mkdir sfdx-cli
-                   tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                   ./sfdx-cli/install
-                   echo 'y' | sfdx plugins:install sfpowerkit
-                   echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
-
-
-             # Checkout the code
-             - name: 'Checkout source code'
-               uses: actions/checkout@v2
-
+            # Checkout the code
+            - name: 'Checkout source code'
+              uses: actions/checkout@v2
 
               # Download Artifacts
 
-             - name: Download Artifacts
-               uses: actions/download-artifact@v2
-               with:
-                 name: validated-artifacts
-                 path: artifacts
+            - name: Download Artifacts
+              uses: actions/download-artifact@v2
+              with:
+                  name: validated-artifacts
+                  path: artifacts
 
+            # Authenticate dev hub
+            - name: 'Authenticate Dev Hub'
+              run: |
+                  echo "${SALESFORCE_JWT_SECRET_KEY}" > ./JWT_KEYFILE
+                  sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                  rm -f ./JWT_KEYFILE
+              env:
+                  SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }}
 
-             # Authenticate to DevHub
-             - name: 'Authenticate to DevHub'
-               shell: bash
-               run: |
-                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
-                     rm -f ./JWT_KEYFILE
-
-
-             # Promoted all packages
-             - name: 'Promote packages'
-               id: sfpowerscripts-build
-               run: 'sfdx sfpowerscripts:orchestrator:promote -v devhub'
+            # Promoted all packages
+            - name: 'Promote packages'
+              id: sfpowerscripts-build
+              run: 'sfdx sfpowerscripts:orchestrator:promote -v devhub'

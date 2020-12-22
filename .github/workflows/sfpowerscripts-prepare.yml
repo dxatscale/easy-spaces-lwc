@@ -5,8 +5,7 @@ name: sfpowerscripts prepare
 on:
     workflow_dispatch:
     schedule:
-     - cron: "0 0 * * *"
-
+        - cron: '0 0 * * *'
 
 # Jobs to be executed
 jobs:
@@ -17,26 +16,26 @@ jobs:
             - name: 'Checkout source code'
               uses: actions/checkout@v2
               with:
-                ref: develop
+                  ref: develop
 
-           # Install sfdx and plugins
+            # Install sfdx and plugins
             - name: Install SFDX and Plugins
               run: |
-                     wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                     mkdir sfdx-cli
-                     tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                     ./sfdx-cli/install
-                     echo 'y' | sfdx plugins:install sfpowerkit
-                     echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
-
+                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                  mkdir sfdx-cli
+                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                  ./sfdx-cli/install
+                  echo 'y' | sfdx plugins:install sfpowerkit
+                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
 
             # Authenticate dev hub
             - name: 'Authenticate Dev Hub'
               run: |
-                     echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
-                     sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
-                     rm -f ./JWT_KEYFILE
-
+                  echo "${SALESFORCE_JWT_SECRET_KEY}" > ./JWT_KEYFILE
+                  sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+                  rm -f ./JWT_KEYFILE
+              env:
+                  SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }}
 
             # Prepare a pool of scratch orgs
             - name: 'Prepare a pool of scratch orgs'
