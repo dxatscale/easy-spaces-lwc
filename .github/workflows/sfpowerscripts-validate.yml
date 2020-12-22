@@ -32,7 +32,8 @@ jobs:
             # Copy Dev Hub server key to file
             - name: 'Copy Dev Hub server key to file'
               shell: bash
-              run: 'echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE'
+              run:  |
+                    echo ${{ secrets.DEVHUB_SERVER_KEY }} > ./JWT_KEYFILE
 
             # Validate source and trigger test
             - name: 'Push source to scratch org'
