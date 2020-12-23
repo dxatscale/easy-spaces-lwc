@@ -33,7 +33,7 @@ jobs:
 
             # Display all Git commits in the checked out repo
             - name: 'Display git commits'
-              run: 'git lg'
+              run: 'git log'
 
 
             # Copy Dev Hub server key to file
