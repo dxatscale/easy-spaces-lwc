@@ -29,6 +29,9 @@ jobs:
             - name: 'Checkout source code'
               uses: actions/checkout@v2
 
+            # Display all Git commits in the checked out repo
+            - name: 'Fetch Origin '
+              run: 'git fetch origin'
 
 
             # Display all Git commits in the checked out repo
@@ -44,9 +47,9 @@ jobs:
               env:
                   SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }} 
 
-            # # Validate source and trigger test
-            # - name: 'Push source to scratch org'
-            #   run: 'sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
+            # Validate source and trigger test
+            - name: 'Push source to scratch org'
+              run: 'sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
 
             # Upload code coverage data
             - name: 'Upload code coverage for Apex to Codecov.io'
