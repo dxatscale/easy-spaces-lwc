@@ -80,7 +80,6 @@ jobs:
               run: |
                   echo "${SALESFORCE_JWT_SECRET_KEY}" > ./JWT_KEYFILE
                   sfdx force:auth:jwt:grant -u ${{ secrets.DEVHUB_USERNAME }} -i ${{ secrets.DEVHUB_CLIENT_ID }} -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
-                  rm -f ./JWT_KEYFILE
               env:
                   SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }}
 
