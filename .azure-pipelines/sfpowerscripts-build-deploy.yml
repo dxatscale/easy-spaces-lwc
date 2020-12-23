@@ -66,10 +66,11 @@ stages:
  
            - checkout: self
  
-           - task: DownloadPipelineArtifact@2
+           - task: DownloadBuildArtifacts@0
              inputs:
               artifactName: 'quickbuild-artifacts'
-              targetPath: artifacts
+              downloadPath: artifacts
+              
            - task: DownloadSecureFile@1
              name: devhubKey
              inputs:
@@ -171,10 +172,10 @@ stages:
              inputs:
               secureFile: 'DEVHUB_SERVER_KEY'
               
-           - task: DownloadPipelineArtifact@2
+           - task: DownloadBuildArtifacts@0
              inputs:
               artifactName: 'validated-artifacts'
-              targetPath: artifacts
+              downloadPath: 'artifacts'
  
            - script: |
                     wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
