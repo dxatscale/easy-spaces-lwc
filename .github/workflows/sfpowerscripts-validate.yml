@@ -33,7 +33,7 @@ jobs:
 
             # Display all Git commits in the checked out repo
             - name: 'Display git commits'
-              run: 'git log'
+              run: 'git show 51514d13bec7505b502a19813aa3f4e3c1a7655e'
 
 
             # Copy Dev Hub server key to file
@@ -44,9 +44,9 @@ jobs:
               env:
                   SALESFORCE_JWT_SECRET_KEY: ${{ secrets.DEVHUB_SERVER_KEY }} 
 
-            # Validate source and trigger test
-            - name: 'Push source to scratch org'
-              run: 'sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
+            # # Validate source and trigger test
+            # - name: 'Push source to scratch org'
+            #   run: 'sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
 
             # Upload code coverage data
             - name: 'Upload code coverage for Apex to Codecov.io'
