@@ -10,8 +10,10 @@ schedules:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
+variables:
+  group: DEVHUB
 
+steps:
 - task: DownloadSecureFile@1
   name: devhubKey
   inputs:
