@@ -1,12 +1,4 @@
-# Prepare a pool of scratch orgs
-
-schedules:
-- cron: "0 0 * * *"
-  displayName: Daily midnight prepare pool
-  branches:
-    include:
-    - develop
-  always: true
+# Validate changes introduced through PR
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -15,6 +7,13 @@ variables:
   group: DEVHUB
 
 steps:
+
+- task: DownloadSecureFile@1
+  name: devhubKey
+  inputs:
+    secureFile: 'DEVHUB_SERVER_KEY'
+
+
 - task: DownloadSecureFile@1
   name: devhubKey
   inputs:
@@ -30,10 +29,8 @@ steps:
   displayName: 'Install SFDX and Plugins'
 
 - script: |
-          sfdx force:auth:jwt:grant -u $(DEVHUB_USERNAME) -i $(DEVHUB_CLIENT_ID) -f $(devhubKey.secureFilePath) -a devhub -r https://login.salesforce.com
-  displayName: 'Authenticate DevHub'
+          sfdx sfpowerscripts:orchestrator:validate -f $(devhubKey.secureFilePath) -i $(DEVHUB_CLIENT_ID) -p CI2 -u $(DEVHUB_USERNAME)  -x
+  displayName: 'Validate Changes'
 
 
-- script: |
-           sfdx sfpowerscripts:orchestrator:prepare -t CI2 -v devhub --installall --installassourcepackages -m 2
-  displayName: 'Prepare a pool of scratch orgs'
+
