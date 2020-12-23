@@ -1,5 +1,7 @@
 # Validate changes introduced through PR
 
+trigger: none
+
 pr:
   autoCancel: false
   drafts: false
