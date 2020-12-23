@@ -1,5 +1,7 @@
 # Prepare a pool of scratch orgs
 
+trigger: none
+
 schedules:
 - cron: "0 0 * * *"
   displayName: Daily midnight prepare pool
