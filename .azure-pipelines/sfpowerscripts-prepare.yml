@@ -1,19 +1,33 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Prepare a pool of scratch orgs
 
-trigger:
-- main
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily midnight prepare pool
+  branches:
+    include:
+    - develop
 
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+          mkdir sfdx-cli
+          tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+          ./sfdx-cli/install
+          echo 'y' | sfdx plugins:install sfpowerkit
+          echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
+  displayName: 'Install SFDX and Plugins'
+
+- script: |
+          echo "$(SALESFORCE_JWT_SECRET_KEY)" > ./JWT_KEYFILE
+          sfdx force:auth:jwt:grant -u $(DEVHUB_USERNAME) -i $(secrets.DEVHUB_CLIENT_ID) -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+  displayName: 'Authenticate DevHub'
+
+
+- script: |
+           sfdx sfpowerscripts:orchestrator:prepare -t CI1 -v devhub --installall --installassourcepackages -m 2
+  displayName: 'Prepare a pool of scratch orgs'
