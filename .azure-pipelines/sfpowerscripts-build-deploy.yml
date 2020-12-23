@@ -11,64 +11,101 @@ stages:
   jobs:
 
     - job: QuickBuildJob
-      displayName: 'Build packages'
+      displayName: 'Quick Build the packages'
+      variables:
+       group:  DEVHUB
       pool:
         vmImage: 'ubuntu-latest'
       steps:
-      
+
           - checkout: self
-            persistCredentials: true
-
-
-          - task: sfpwowerscript-installsfdx-task@7
-            displayName: Install SFDX and sfpowerkit
-
-          - task: CmdLine@2
-            displayName: Install sfpowerscripts plugin
+          - task: DownloadSecureFile@1
+            name: devhubKey
             inputs:
-              script: 'echo ''y'' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha'
+             secureFile: 'DEVHUB_SERVER_KEY'
+
+          - script: |
+                   wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                   mkdir sfdx-cli
+                   tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                   ./sfdx-cli/install
+                   echo 'y' | sfdx plugins:install sfpowerkit
+                   echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
+            displayName: 'Install SFDX and Plugins'
+            
+
+          - script: |
+              sfdx force:auth:jwt:grant -u $(DEVHUB_USERNAME) -i $(DEVHUB_CLIENT_ID) -f $(devhubKey.secureFilePath) -a devhub -r https://login.salesforce.com
+            displayName: 'Authenticate DevHub'
               
           
           - task: CmdLine@2
             displayName: 'Build All Packages'
             inputs:
-              script: 'sfdx sfpowerscripts:orchestrator:build --buildnumber=$(BuildID) --diffcheck --gittag'
-      
-          - task: CmdLine@2
-            displayName: 'Push Git Tags'
+              script: 'sfdx sfpowerscripts:orchestrator:quickbuild -v devhub'
+
+          - task: PublishBuildArtifacts@1
             inputs:
-              script: ' git push origin --tags'
+              PathtoPublish: 'artifacts'
+              ArtifactName: 'quickbuild-artifacts'
+              publishLocation: 'Container'
               
-- stage: UAT
-  displayName: 'UAT'
-  dependsOn: Build
+- stage: Deploy
+  displayName: 'Deploy and Validate the packages'
+  dependsOn: QuickBuild
   jobs:
        
-    -  deployment: DeployUATJob
-       displayName: 'Deploy to UAT'
-       environment: UAT
-       pool:
-         vmImage: 'ubuntu-latest'
-       strategy:
-        runOnce:
-          deploy:
-            steps:  
-              - task: sfpwowerscript-installsfdx-task@7
-                displayName: 'Install SFDX with sfpowerkit'
-                
-              - task: sfpwowerscript-authenticateorg-task@9
-                displayName: Authenticate  $(alias) using JWT
-                inputs:
-                  method: JWT
-                  jwt_key_file: ee4aa9ab-71ea-4a2d-a27a-1ebb3e8dd0bc
-                  username: $(username)
-                  alias: $(alias)
-                  clientid: $(consumer_key)
-                  
-              - task: CmdLine@2
-                displayName: 'Deploy to UAT'
-                inputs:
-                  script: 'sfdx sfpowerscripts:orchestrator:deploy -u $(alias) --artifactdir $(Pipeline.Workspace) -g "##[group],##[endgroup]" --skipifalreadyinstalled'
+    - job: DeployJob
+      displayName: 'Deploy the packages'
+      variables:
+       group:  DEVHUB
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+
+          - checkout: self
+
+          - task: DownloadPipelineArtifact@2
+            inputs:
+             artifactName: 'quickbuild-artifacts'
+             targetPath: artifacts
+          - task: DownloadSecureFile@1
+            name: devhubKey
+            inputs:
+             secureFile: 'DEVHUB_SERVER_KEY'
+
+          - script: |
+                   wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+                   mkdir sfdx-cli
+                   tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
+                   ./sfdx-cli/install
+                   echo 'y' | sfdx plugins:install sfpowerkit
+                   echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
+            displayName: 'Install SFDX and Plugins'
+            
+
+          - script: |
+              sfdx force:auth:jwt:grant -u $(DEVHUB_USERNAME) -i $(DEVHUB_CLIENT_ID) -f $(devhubKey.secureFilePath) -a devhub -r https://login.salesforce.com
+            displayName: 'Authenticate DevHub'
+              
+          
+          - task: CmdLine@2
+            displayName: 'Create ScratchOrg'
+            inputs:
+              script: 'sfdx force:org:create -f config/project-scratch-def.json -a scratch-org -s -d 1 -v devhub'
+
+          - task: CmdLine@2
+            displayName: 'Deploy packages to scratch org'
+            inputs:
+              script: 'fdx sfpowerscripts:orchestrator:deploy -u scratch-org'
+
+
+          - task: CmdLine@2
+            displayName: 'Delete scratch org'
+            condition: always()
+            inputs:
+              script: 'sfdx force:org:delete -p -u scratch-org'
+
                
        
        
