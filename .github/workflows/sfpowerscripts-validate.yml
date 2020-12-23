@@ -28,16 +28,8 @@ jobs:
             # Checkout the code in the pull request
             - name: 'Checkout source code'
               uses: actions/checkout@v2
-
-            # Display all Git commits in the checked out repo
-            - name: 'Fetch Origin '
-              run: 'git fetch origin'
-
-
-            # Display all Git commits in the checked out repo
-            - name: 'Display git commits'
-              run: 'git show 51514d13bec7505b502a19813aa3f4e3c1a7655e'
-
+              with:
+                fetch-depth: 0
 
             # Copy Dev Hub server key to file
             - name: 'Copy Dev Hub server key to file'
