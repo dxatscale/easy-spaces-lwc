@@ -137,7 +137,6 @@ jobs:
 
     promote:
         runs-on: ubuntu-latest
-        if: always()
         needs: build
         name: Promote the packages
         steps:
