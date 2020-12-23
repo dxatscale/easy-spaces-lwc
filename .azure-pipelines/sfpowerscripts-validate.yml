@@ -19,12 +19,6 @@ steps:
   inputs:
     secureFile: 'DEVHUB_SERVER_KEY'
 
-
-- task: DownloadSecureFile@1
-  name: devhubKey
-  inputs:
-    secureFile: 'DEVHUB_SERVER_KEY'
-
 - script: |
           wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
           mkdir sfdx-cli
