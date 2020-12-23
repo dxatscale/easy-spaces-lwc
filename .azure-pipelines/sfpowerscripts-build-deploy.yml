@@ -1,0 +1,74 @@
+
+name: Build and Release
+
+
+stages:
+
+#Merge to Develop, Deploy Alpha builds
+- stage: QuickBuild
+  displayName: QuickBuild
+  dependsOn: []
+  jobs:
+
+    - job: QuickBuildJob
+      displayName: 'Build packages'
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+      
+          - checkout: self
+            persistCredentials: true
+
+
+          - task: sfpwowerscript-installsfdx-task@7
+            displayName: Install SFDX and sfpowerkit
+
+          - task: CmdLine@2
+            displayName: Install sfpowerscripts plugin
+            inputs:
+              script: 'echo ''y'' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha'
+              
+          
+          - task: CmdLine@2
+            displayName: 'Build All Packages'
+            inputs:
+              script: 'sfdx sfpowerscripts:orchestrator:build --buildnumber=$(BuildID) --diffcheck --gittag'
+      
+          - task: CmdLine@2
+            displayName: 'Push Git Tags'
+            inputs:
+              script: ' git push origin --tags'
+              
+- stage: UAT
+  displayName: 'UAT'
+  dependsOn: Build
+  jobs:
+       
+    -  deployment: DeployUATJob
+       displayName: 'Deploy to UAT'
+       environment: UAT
+       pool:
+         vmImage: 'ubuntu-latest'
+       strategy:
+        runOnce:
+          deploy:
+            steps:  
+              - task: sfpwowerscript-installsfdx-task@7
+                displayName: 'Install SFDX with sfpowerkit'
+                
+              - task: sfpwowerscript-authenticateorg-task@9
+                displayName: Authenticate  $(alias) using JWT
+                inputs:
+                  method: JWT
+                  jwt_key_file: ee4aa9ab-71ea-4a2d-a27a-1ebb3e8dd0bc
+                  username: $(username)
+                  alias: $(alias)
+                  clientid: $(consumer_key)
+                  
+              - task: CmdLine@2
+                displayName: 'Deploy to UAT'
+                inputs:
+                  script: 'sfdx sfpowerscripts:orchestrator:deploy -u $(alias) --artifactdir $(Pipeline.Workspace) -g "##[group],##[endgroup]" --skipifalreadyinstalled'
+               
+       
+       
