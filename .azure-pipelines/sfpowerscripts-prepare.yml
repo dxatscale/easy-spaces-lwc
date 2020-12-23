@@ -12,6 +12,10 @@ pool:
 
 steps:
 
+- task: DownloadSecureFile@1
+  name: devhubKey
+  inputs:
+    secureFile: 'DEVHUB_SERVER_KEY'
 
 - script: |
           wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
@@ -23,8 +27,7 @@ steps:
   displayName: 'Install SFDX and Plugins'
 
 - script: |
-          echo "$(SALESFORCE_JWT_SECRET_KEY)" > ./JWT_KEYFILE
-          sfdx force:auth:jwt:grant -u $(DEVHUB_USERNAME) -i $(DEVHUB_CLIENT_ID) -f ./JWT_KEYFILE -a devhub -r https://login.salesforce.com
+          sfdx force:auth:jwt:grant -u $(DEVHUB_USERNAME) -i $(DEVHUB_CLIENT_ID) -f $(devhubKey.secureFilePath) -a devhub -r https://login.salesforce.com
   displayName: 'Authenticate DevHub'
 
 
