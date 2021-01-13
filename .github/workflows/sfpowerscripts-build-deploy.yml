@@ -27,6 +27,8 @@ jobs:
             # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0 
 
             # Authenticate dev hub
             - name: 'Authenticate Dev Hub'
@@ -54,9 +56,12 @@ jobs:
         runs-on: ubuntu-latest
         needs: quickbuild
         steps:
+
             # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0 
 
               # Download Artifacts
             - name: Download Artifacts
@@ -110,10 +115,12 @@ jobs:
                   ./sfdx-cli/install
                   echo 'y' | sfdx plugins:install sfpowerkit
                   echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts@alpha
-
-              # Checkout the code
+                  
+            # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0 
 
               # Authenticate dev hub
             - name: 'Authenticate Dev Hub'
@@ -153,6 +160,8 @@ jobs:
             # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0 
 
               # Download Artifacts
 
