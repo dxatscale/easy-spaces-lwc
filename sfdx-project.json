@@ -34,7 +34,7 @@
             "versionName": "Space Management App - Winter '21",
             "versionNumber": "50.0.1.NEXT",
             "default": true,
-            "assignPermSetsPostDeployment":[ "SpaceManagementApp" ]
+            "assignPermSetsPostDeployment":[ "SpaceManagementApp" ],
             "dependencies": [
                 {
                     "package": "ESObjects",
