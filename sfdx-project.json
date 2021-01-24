@@ -16,7 +16,7 @@
             "default": false
         },
         {
-            "path": "es-base-code",
+            "path": "./es-base-code",
             "package": "ESBaseCodeLWC",
             "versionName": "Base Code LWC - Winter '21",
             "versionNumber": "50.0.2.NEXT",
