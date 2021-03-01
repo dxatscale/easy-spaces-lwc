@@ -13,6 +13,7 @@ on:
 jobs:
     validate:
         runs-on: ubuntu-latest
+        container: dxatscale/sfpowerscripts:latest
         steps:
             # Install sfdx and plugins
             - name: Install SFDX and Plugins
