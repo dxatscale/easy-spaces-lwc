@@ -13,8 +13,17 @@ on:
 jobs:
     validate:
         runs-on: ubuntu-latest
-        container: dxatscale/sfpowerscripts:latest
+        container: shalikcarbon/sfdx-sfdmu-ci
         steps:
+            # - uses: docker://dxatscale/sfpowerscripts:latest
+            #   with:
+            #     entrypoint: /bin/bash -e
+            - name: 'test'
+              run: |
+                cat /etc/os-release
+                sfdx plugins
+
+
             # Checkout the code in the pull request
             - name: 'Checkout source code'
               uses: actions/checkout@v2
@@ -31,7 +40,10 @@ jobs:
 
             # Validate source and trigger test
             - name: 'Push source to scratch org'
-              run: 'sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x'
+              run: |
+                echo 'y' | sfdx plugins:install sfpowerkit
+                echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
+                sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x
 
             # Upload code coverage data
             - name: 'Upload code coverage for Apex to Codecov.io'

@@ -11,13 +11,20 @@ pr:
 pool:
     vmImage: 'ubuntu-latest'
 
+container: shalikcarbon/sfdx-sfdmu-ci:latest
+
 variables:
     group: DEVHUB
 
 steps:
 
     - checkout: self
-      persistCredentials: true  
+      persistCredentials: true
+
+    - script: |
+        sfdx plugins
+        echo $JAVA_HOME
+      displayName: 'Test'
 
     - task: DownloadSecureFile@1
       name: devhubKey
@@ -25,14 +32,7 @@ steps:
           secureFile: 'DEVHUB_SERVER_KEY'
 
     - script: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-          mkdir sfdx-cli
-          tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-          ./sfdx-cli/install
           echo 'y' | sfdx plugins:install sfpowerkit
           echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
-      displayName: 'Install SFDX and Plugins'
-
-    - script: |
           sfdx sfpowerscripts:orchestrator:validate -f $(devhubKey.secureFilePath) -i $(DEVHUB_CLIENT_ID) -p CI2 -u $(DEVHUB_USERNAME)  -x
       displayName: 'Validate Changes'
