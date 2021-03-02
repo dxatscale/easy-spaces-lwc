@@ -13,7 +13,7 @@ on:
 jobs:
     validate:
         runs-on: ubuntu-latest
-        container: shalikcarbon/sfdx-sfdmu-ci
+        container: dxatscale/sfpowerscripts
         steps:
             # - uses: docker://dxatscale/sfpowerscripts:latest
             #   with:
@@ -21,6 +21,7 @@ jobs:
             - name: 'test'
               run: |
                 cat /etc/os-release
+                set DEBUG=*
                 sfdx plugins
 
 
