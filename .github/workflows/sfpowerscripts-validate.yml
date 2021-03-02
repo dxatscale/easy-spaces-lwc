@@ -20,6 +20,9 @@ jobs:
             #     entrypoint: /bin/bash -e
             - name: 'test'
               run: |
+                export XDG_DATA_HOME="$HOME/.local/share"
+                export XDG_CACHE_HOME="$HOME/.cache"
+                export XDG_CONFIG_HOME="$HOME/.config"
                 cat /etc/os-release
                 export DEBUG=*
                 sfdx plugins --core
