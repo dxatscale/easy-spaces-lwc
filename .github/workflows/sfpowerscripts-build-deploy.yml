@@ -13,17 +13,8 @@ jobs:
     quickbuild:
         name: QuickBuild the packages
         runs-on: ubuntu-latest
+        container: dxatscale/sfpowerscripts
         steps:
-            # Install CLI and PLugins
-            - name: Install SFDX and Plugins
-              run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                  mkdir sfdx-cli
-                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                  ./sfdx-cli/install
-                  echo 'y' | sfdx plugins:install sfpowerkit
-                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
-
             # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
@@ -54,6 +45,7 @@ jobs:
     deploy:
         name: Deploy and Validate the packages
         runs-on: ubuntu-latest
+        container: dxatscale/sfpowerscripts
         needs: quickbuild
         steps:
             # Checkout the code
@@ -68,16 +60,6 @@ jobs:
               with:
                   name: quickbuild-artifacts
                   path: artifacts
-
-              # Install sfdx and plugins
-            - name: Install SFDX and Plugins
-              run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                  mkdir sfdx-cli
-                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                  ./sfdx-cli/install
-                  echo 'y' | sfdx plugins:install sfpowerkit
-                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
 
             # Authenticate dev hub
             - name: 'Authenticate Dev Hub'
@@ -103,18 +85,9 @@ jobs:
     build:
         name: Build Production Ready packages
         runs-on: ubuntu-latest
+        container: dxatscale/sfpowerscripts
         needs: deploy
         steps:
-            # Install sfdx and plugins
-            - name: Install SFDX and Plugins
-              run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                  mkdir sfdx-cli
-                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                  ./sfdx-cli/install
-                  echo 'y' | sfdx plugins:install sfpowerkit
-                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
-
             # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
@@ -143,19 +116,10 @@ jobs:
 
     promote:
         runs-on: ubuntu-latest
+        container: dxatscale/sfpowerscripts
         needs: build
         name: Promote the packages
         steps:
-            # Install sfdx and plugins
-            - name: Install SFDX and Plugins
-              run: |
-                  wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
-                  mkdir sfdx-cli
-                  tar xJf sfdx-linux-amd64.tar.xz -C sfdx-cli --strip-components 1
-                  ./sfdx-cli/install
-                  echo 'y' | sfdx plugins:install sfpowerkit
-                  echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
-
             # Checkout the code
             - name: 'Checkout source code'
               uses: actions/checkout@v2
