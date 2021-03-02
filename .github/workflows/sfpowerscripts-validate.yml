@@ -23,6 +23,7 @@ jobs:
                 cat /etc/os-release
                 set DEBUG=*
                 sfdx plugins
+                sfdx force:org:list
 
 
             # Checkout the code in the pull request
