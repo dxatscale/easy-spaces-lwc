@@ -11,7 +11,7 @@ pr:
 pool:
     vmImage: 'ubuntu-latest'
 
-container: shalikcarbon/sfdx-sfdmu-ci:latest
+container: dxatscale/sfpowerscripts:latest
 
 variables:
     group: DEVHUB
@@ -22,8 +22,10 @@ steps:
       persistCredentials: true
 
     - script: |
+        whoami
+        export DEBUG=*
         sfdx plugins
-        echo $JAVA_HOME
+        ls -a $XDG_DATA_HOME
       displayName: 'Test'
 
     - task: DownloadSecureFile@1
@@ -32,7 +34,6 @@ steps:
           secureFile: 'DEVHUB_SERVER_KEY'
 
     - script: |
-          echo 'y' | sfdx plugins:install sfpowerkit
-          echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
-          sfdx sfpowerscripts:orchestrator:validate -f $(devhubKey.secureFilePath) -i $(DEVHUB_CLIENT_ID) -p CI2 -u $(DEVHUB_USERNAME)  -x
+       export DEBUG=*
+       sudo sfdx sfpowerscripts:orchestrator:validate -f $(devhubKey.secureFilePath) -i $(DEVHUB_CLIENT_ID) -p CI2 -u $(DEVHUB_USERNAME)  -x
       displayName: 'Validate Changes'

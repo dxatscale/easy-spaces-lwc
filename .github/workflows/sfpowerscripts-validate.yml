@@ -15,22 +15,11 @@ jobs:
         runs-on: ubuntu-latest
         container: dxatscale/sfpowerscripts
         steps:
-            # - uses: docker://dxatscale/sfpowerscripts:latest
-            #   with:
-            #     entrypoint: /bin/bash -e
+            # Checkout the code in the pull request
             - name: 'test'
               run: |
-                export XDG_DATA_HOME="$HOME/.local/share"
-                export XDG_CACHE_HOME="$HOME/.cache"
-                export XDG_CONFIG_HOME="$HOME/.config"
-                cat /etc/os-release
-                export DEBUG=*
-                sfdx plugins --core
-                sfdx plugins
-                sfdx force:org:list --dev-suspend
+                  whoami
 
-
-            # Checkout the code in the pull request
             - name: 'Checkout source code'
               uses: actions/checkout@v2
               with:
@@ -47,8 +36,6 @@ jobs:
             # Validate source and trigger test
             - name: 'Push source to scratch org'
               run: |
-                echo 'y' | sfdx plugins:install sfpowerkit
-                echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
                 sfdx sfpowerscripts:orchestrator:validate -f ./JWT_KEYFILE -i ${{ secrets.DEVHUB_CLIENT_ID }} -p CI1 -u  ${{ secrets.DEVHUB_USERNAME }} -x
 
             # Upload code coverage data
