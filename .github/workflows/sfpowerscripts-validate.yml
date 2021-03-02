@@ -23,7 +23,7 @@ jobs:
                 cat /etc/os-release
                 set DEBUG=*
                 sfdx plugins
-                sfdx force:org:list
+                sfdx force:org:list --dev-suspend
 
 
             # Checkout the code in the pull request
