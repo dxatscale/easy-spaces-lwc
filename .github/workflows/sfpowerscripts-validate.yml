@@ -21,7 +21,8 @@ jobs:
             - name: 'test'
               run: |
                 cat /etc/os-release
-                set DEBUG=*
+                export DEBUG=*
+                sfdx plugins --core
                 sfdx plugins
                 sfdx force:org:list --dev-suspend
 
