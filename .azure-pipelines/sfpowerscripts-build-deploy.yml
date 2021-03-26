@@ -44,7 +44,7 @@ stages:
           - job: DeployJob
             displayName: 'Deploy the packages'
             variables:
-                group: DEVHUB
+              - group: DEVHUB
             pool:
                 vmImage: 'ubuntu-latest'
             container: dxatscale/sfpowerscripts:latest

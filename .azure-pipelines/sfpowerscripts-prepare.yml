@@ -16,7 +16,7 @@ pool:
 container: dxatscale/sfpowerscripts:latest
 
 variables:
-    group: DEVHUB
+  - group: DEVHUB
 
 steps:
     - task: DownloadSecureFile@1
