@@ -2,6 +2,7 @@ name: Build and Release
 
 trigger:
     - develop
+pr: none
 
 stages:
     - stage: QuickBuild

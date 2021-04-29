@@ -1,6 +1,7 @@
 # Prepare a pool of scratch orgs
 
 trigger: none
+pr: none
 
 schedules:
     - cron: '0 0 * * *'

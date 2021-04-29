@@ -1,6 +1,7 @@
 name: Fetch and Release
 
 trigger: none
+pr: none
 
 stages:
     - stage: release
